@@ -8,11 +8,11 @@ import requests
 # Configuration file path
 CONFIG_FILE = os.path.expanduser('~/.mailgun-cli.ini')
 
-def create_mailing_list(address, name, domain, api_key):
+def create_mailing_list(name, description, domain, api_key):
     mailing_list_url = 'https://api.mailgun.net/v3/lists'
     data = {
-        'address': address+'@'+domain,
-        'name': name
+        'address': name+'@'+domain,
+        'description': description
     }
     response = requests.post(mailing_list_url, auth=('api', api_key), data=data)
     print(f"Response Status Code: {response.status_code}")
@@ -103,8 +103,8 @@ def main():
 
     # Create mailing list
     create_parser = subparsers.add_parser('create', help='Create a new mailing list')
-    create_parser.add_argument('address', help='Mailing list address')
-    create_parser.add_argument('name', help='Mailing list name')
+    create_parser.add_argument('name', help='Mailing list name (without the domain part)')
+    create_parser.add_argument('description', help='Mailing list description')
 
     # Delete mailing list
     delete_parser = subparsers.add_parser('delete', help='Delete a mailing list')
@@ -144,7 +144,7 @@ def main():
         api_key = config['mailgun']['api_key']
 
         if args.command == 'create':
-            create_mailing_list(args.address, args.name, domain, api_key)
+            create_mailing_list(args.name, args.description, domain, api_key)
         elif args.command == 'delete':
             delete_mailing_list(args.address, api_key)
         elif args.command == 'add':
