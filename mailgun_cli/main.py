@@ -8,10 +8,10 @@ import requests
 # Configuration file path
 CONFIG_FILE = os.path.expanduser('~/.mailgun-cli.ini')
 
-def create_mailing_list(address, name, api_key):
+def create_mailing_list(address, name, domain, api_key):
     mailing_list_url = 'https://api.mailgun.net/v3/lists'
     data = {
-        'address': address,
+        'address': address+'@'+domain,
         'name': name
     }
     response = requests.post(mailing_list_url, auth=('api', api_key), data=data)
@@ -144,7 +144,7 @@ def main():
         api_key = config['mailgun']['api_key']
 
         if args.command == 'create':
-            create_mailing_list(args.address, args.name, api_key)
+            create_mailing_list(args.address, args.name, domain, api_key)
         elif args.command == 'delete':
             delete_mailing_list(args.address, api_key)
         elif args.command == 'add':
