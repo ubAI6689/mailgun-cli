@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='mailgun-cli',
+    name='mailgun_cli',
     version='1.0.0',
     author='Abu Ubaidah',
     author_email='ub.AI6689@gmail.com',
