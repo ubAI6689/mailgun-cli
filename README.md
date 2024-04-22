@@ -12,8 +12,12 @@ git clone https://github.com/ubAI6689/mailgun-cli.git
 ```
 cd mailgun-cli
 ```
-
-3. Install the package:
+3. Create and activate a venv:
+```
+python -m venv venv
+source venv/bin/activate
+```
+4. Install the package:
 ```
 pip install .
 ```
@@ -28,8 +32,11 @@ mailgun setup
 - Create a mailing list: `mailgun create <address> <name>`
 - Delete a mailing list: `mailgun delete <address>`
 - Add a member to a mailing list: `mailgun add <list_address> <member_address> <name>`
+- Add members from a csv file: `mailgun add_from_csv <list_address> <csv_file_path>`
 - Remove a member from a mailing list: `mailgun remove <list_address> <member_address>`
+- Print a mailing list members: `mailgun print <list_address>`
 - Send a message to a mailing list: `mailgun send <list_address> <subject> <text>`
+- List all mailing lists: `mailgun list`
 
 ## Contributing
 

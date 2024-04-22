@@ -177,7 +177,7 @@ def main():
     
     # Remove member
     remove_parser = subparsers.add_parser('remove', help='Remove a member from a mailing list')
-    remove_parser.add_argument('list_address', help='Mailing list address')
+    remove_parser.add_argument('list_name', help='Mailing list name (without the domain part)')
     remove_parser.add_argument('member_address', help='Member email address')
 
     # Print member
@@ -213,7 +213,7 @@ def main():
         elif args.command == 'add':
             add_member(args.list_name, args.member_name, args.member_address, domain, api_key)
         elif args.command == 'remove':
-            remove_member(args.list_address, args.member_address, domain, api_key)
+            remove_member(args.list_name, args.member_address, domain, api_key)
         elif args.command == 'send':
             send_message(args.list_address, args.subject, args.text, domain, api_key)
         elif args.command == 'list' :
