@@ -34,16 +34,9 @@ def delete_mailing_list(address, api_key):
     else:
         raise Exception(f"Error: {response.status_code} - {response.text}")
     
-# def create_lists_from_csv(csv_file_path, domain, api_key):
-#     with open(csv_file_path, 'r') as file:
-#         reader = csv.reader(file)
-#         next(reader)  # Skip the header row if present
-#         for row in reader:
-#             list_name= row[0]
-#             list_description = row[1]
-#             create_mailing_list(list_name, list_description, domain, api_key)
 
-def add_member(list_address, member_name, member_address, api_key):
+def add_member(list_name, member_name, member_address, domain, api_key):
+    list_address = list_name + "@" + domain
     list_url = f'https://api.mailgun.net/v3/lists/{list_address}/members'
     data = {
         "name": member_name,
@@ -57,16 +50,9 @@ def add_member(list_address, member_name, member_address, api_key):
     else:
         raise Exception(f"Error: {response.status_code} - {response.text}")
     
-# def add_members_from_csv(list_address, csv_file_path, api_key):
-#     with open(csv_file_path, 'r') as file:
-#         reader = csv.reader(file)
-#         next(reader)  # Skip the header row if present
-#         for row in reader:
-#             member_name = row[0]
-#             member_address = row[1]
-#             add_member(list_address, member_name, member_address, api_key)
 
-def add_members_from_csv(api_key, list_address, csv_file_path):
+def add_members_from_csv(list_name, csv_file_path, domain, api_key, ):
+    list_address = list_name + "@" + domain
     # Prepare the API endpoint URL
     url = f"https://api.mailgun.net/v3/lists/{list_address}/members.csv"
     
@@ -88,12 +74,18 @@ def add_members_from_csv(api_key, list_address, csv_file_path):
             print(f"Status code: {response.status_code}")
             print(f"Response: {response.text}")
 
-def remove_member(list_address, member_address, domain, api_key):
-    base_url = f'https://api.mailgun.net/v3/{domain}'
+def remove_member(list_name, member_address, domain, api_key):
+    list_address = list_name + "@" + domain
+    base_url = f'https://api.mailgun.net/v3'
     mailing_list_url = f'{base_url}/lists'
     list_url = f'{mailing_list_url}/{list_address}/members/{member_address}'
     response = requests.delete(list_url, auth=('api', api_key))
-    return response.status_code
+    print(f"Response Status Code: {response.status_code}")
+    print(f"Response Text: {response.text}")
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Error: {response.status_code} - {response.text}")
 
 def print_list_members(list_name, domain, api_key):
     list_address = list_name + '@' + domain
@@ -174,13 +166,13 @@ def main():
 
     # Add member
     add_parser = subparsers.add_parser('add', help='Add a member to a mailing list')
-    add_parser.add_argument('list_address', help='Mailing list address')
+    add_parser.add_argument('list_name', help='Mailing list name (without the domain part)')
     add_parser.add_argument('member_name', help='Member name')
     add_parser.add_argument('member_address', help='Member email address')
 
     # Add members from CSV
     add_csv_parser = subparsers.add_parser('add_from_csv', help='Add members to a mailing list from a CSV file')
-    add_csv_parser.add_argument('list_address', help='Mailing list address')
+    add_csv_parser.add_argument('list_name', help='Mailing list name (without the domain part)')
     add_csv_parser.add_argument('csv_file_path', help='Path to the CSV file containing member data')
     
     # Remove member
@@ -188,9 +180,9 @@ def main():
     remove_parser.add_argument('list_address', help='Mailing list address')
     remove_parser.add_argument('member_address', help='Member email address')
 
-    # Get member
-    get_parser = subparsers.add_parser('print', help='Get all members from a mailing list')
-    get_parser.add_argument('list_address', help='Mailing list name (without the domain part)')
+    # Print member
+    print_parser = subparsers.add_parser('print', help='Get all members from a mailing list')
+    print_parser.add_argument('list_name', help='Mailing list name (without the domain part)')
     
     # Send message
     send_parser = subparsers.add_parser('send', help='Send a message to a mailing list')
@@ -219,7 +211,7 @@ def main():
         elif args.command == 'delete':
             delete_mailing_list(args.address, api_key)
         elif args.command == 'add':
-            add_member(args.list_address, args.member_name, args.member_address, api_key)
+            add_member(args.list_name, args.member_name, args.member_address, domain, api_key)
         elif args.command == 'remove':
             remove_member(args.list_address, args.member_address, domain, api_key)
         elif args.command == 'send':
@@ -227,11 +219,11 @@ def main():
         elif args.command == 'list' :
             list_mailing_lists(api_key)
         elif args.command == 'print':
-            print_list_members(args.list_address, domain, api_key)
+            print_list_members(args.list_name, domain, api_key)
         # elif args.command == 'create_from_csv':
         #     create_lists_from_csv(args.csv_file_path, domain, api_key)  
         elif args.command == 'add_from_csv':
-            add_members_from_csv(api_key, args.list_address, args.csv_file_path)
+            add_members_from_csv(args.list_name, args.csv_file_path, domain, api_key)
             
 
 
