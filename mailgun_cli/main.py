@@ -125,6 +125,25 @@ def list_mailing_lists(api_key):
             print(f"Address: {mlist['address']}, Description: {mlist['description']}")
     else:
         print(f"Error: {response.status_code} - {response.text}")
+        
+def list_member_groups(email, domain, api_key):
+    url = f"https://api.mailgun.net/v3/lists/pages"
+    params = {
+        "subscribed": email,
+        "limit": 100
+    }
+    response = requests.get(url, auth=('api', api_key), params=params)
+    
+    if response.status_code == 200:
+        lists = response.json()["items"]
+        if lists:
+            print(f"Groups that {email} is a member of:")
+            for list_item in lists:
+                print(f"- {list_item['address']}")
+        else:
+            print(f"{email} is not a member of any groups.")
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
 
 def load_config():
     config = configparser.ConfigParser()
@@ -192,6 +211,10 @@ def main():
     
     # List mailing lists
     list_parser = subparsers.add_parser('list', help='List all mailing lists')
+    
+    # List member groups
+    list_groups_parser = subparsers.add_parser('list_groups', help='List all groups an email is a member of')
+    list_groups_parser.add_argument('email', help='Email address to check')
 
     args = parser.parse_args()
 
@@ -224,6 +247,8 @@ def main():
         #     create_lists_from_csv(args.csv_file_path, domain, api_key)  
         elif args.command == 'add_from_csv':
             add_members_from_csv(args.list_name, args.csv_file_path, domain, api_key)
+        elif args.command == 'list_groups':
+            list_member_groups(args.email, domain, api_key)
             
 
 

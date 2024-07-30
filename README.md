@@ -37,9 +37,12 @@ mailgun setup
 - Print a mailing list members: `mailgun print <list_address>`
 - Send a message to a mailing list: `mailgun send <list_address> <subject> <text>`
 - List all mailing lists: `mailgun list`
+- List all groups an email is a member of: `mailgun list_groups <email>`
 
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
 
 ## License
+
+[Include your license information here]
