@@ -19,7 +19,7 @@ source venv/bin/activate
 ```
 4. Install the package:
 ```
-pip install .
+pip install -e .
 ```
 
 ## Usage
