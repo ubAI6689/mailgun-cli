@@ -2,6 +2,9 @@ import os
 import subprocess
 import sys
 
+# Suppress LibreSSL warning on macOS
+os.environ["PYTHONWARNINGS"] = "ignore::UserWarning"
+
 # Path to mailgun executable in venv
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MAILGUN_CMD = os.path.join(SCRIPT_DIR, "..", "venv", "bin", "mailgun")
@@ -22,14 +25,37 @@ def get_list_names():
 
 
 def get_emails():
-    """Get email addresses from user input (one per line, empty line to finish)."""
-    print("Enter email addresses (one per line, empty line to finish):")
+    """Get email addresses from user input."""
+    print("Paste email addresses (one per line), then press Enter twice to finish:")
+    print("-" * 50)
+
     emails = []
+    empty_count = 0
+
     while True:
-        line = input("Email: ").strip()
-        if not line:
+        try:
+            line = input().strip()
+            if not line:
+                empty_count += 1
+                if empty_count >= 1:
+                    break
+                continue
+            empty_count = 0
+
+            # Handle comma or space separated emails
+            if ',' in line or (' ' in line and '@' in line):
+                parts = line.replace(',', ' ').split()
+                for part in parts:
+                    part = part.strip()
+                    if part and '@' in part:
+                        emails.append(part)
+            elif '@' in line:
+                emails.append(line)
+        except EOFError:
             break
-        emails.append(line)
+
+    print("-" * 50)
+    print(f"Captured {len(emails)} email(s)")
     return emails
 
 
@@ -37,7 +63,7 @@ def add_members_to_list(list_name, emails):
     """Add members to a mailing list."""
     for email in emails:
         print(f"  Adding {email}...")
-        subprocess.run([MAILGUN_CMD, "add", list_name, email, email])
+        subprocess.run([MAILGUN_CMD, "add", list_name, email, email], stderr=subprocess.DEVNULL)
 
 
 if __name__ == "__main__":
