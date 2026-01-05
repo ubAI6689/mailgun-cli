@@ -23,7 +23,7 @@ def get_list_names():
 
 def get_emails():
     """Get email addresses from user input (one per line, empty line to finish)."""
-    print("Enter email addresses (one per line, empty line to finish):")
+    print("Enter email addresses to remove (one per line, empty line to finish):")
     emails = []
     while True:
         line = input("Email: ").strip()
@@ -33,11 +33,11 @@ def get_emails():
     return emails
 
 
-def add_members_to_list(list_name, emails):
-    """Add members to a mailing list."""
+def remove_members_from_list(list_name, emails):
+    """Remove members from a mailing list."""
     for email in emails:
-        print(f"  Adding {email}...")
-        subprocess.run([MAILGUN_CMD, "add", list_name, email, email])
+        print(f"  Removing {email}...")
+        subprocess.run([MAILGUN_CMD, "remove", list_name, email])
 
 
 if __name__ == "__main__":
@@ -51,9 +51,9 @@ if __name__ == "__main__":
         print("No emails provided.")
         sys.exit(1)
 
-    print(f"\nAdding {len(emails)} member(s) to {len(list_names)} list(s)...\n")
+    print(f"\nRemoving {len(emails)} member(s) from {len(list_names)} list(s)...\n")
     for list_name in list_names:
         print(f"[{list_name}]")
-        add_members_to_list(list_name, emails)
+        remove_members_from_list(list_name, emails)
         print()
     print("Done.")
